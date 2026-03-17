@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
 using PaintApp.ViewModels;
 
@@ -12,6 +13,12 @@ public partial class CanvasView : UserControl
     public CanvasView()
     {
         InitializeComponent();
+    }
+
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -49,8 +56,10 @@ public partial class CanvasView : UserControl
 
     private Point RelativePositionToPointAsRatio(Point relativePosition)
     {
-        Point pointAsRatio = new(relativePosition.X / 500,
-            relativePosition.Y / 500);
+        Point pointAsRatio = new(relativePosition.X / this.FindDescendantOfType<Image>().Bounds.Size.Width,
+            relativePosition.Y / this.FindDescendantOfType<Image>().Bounds.Size.Height);
+        
+        Console.WriteLine(pointAsRatio);
         
         return pointAsRatio;
     }

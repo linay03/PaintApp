@@ -13,7 +13,7 @@
     </Design.DataContext>
     
     <Panel>
-        <Image Width="500" Height="500" Source="{Binding SourceBitmap}" />
+        <Image Source="{Binding SourceBitmap}" />
     </Panel>
     
 </UserControl>
