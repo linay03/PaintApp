@@ -1,20 +1,27 @@
+using System.Collections.Generic;
 using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media.Imaging;
 using Avalonia.VisualTree;
+using PaintApp.Services;
 using SkiaSharp;
 
 namespace PaintApp.Views;
 
 public partial class CanvasView : UserControl
 {
+    IInterpolationService interpolationService;
+    
     private SKBitmap skBitmap;
     private bool isPointerPressed;
+    private Point? previousStrockPoint;
     
     public CanvasView()
     {
+        interpolationService = new InterpolationService();
+            
         skBitmap = new(width: 500, height: 500);
         InitializeComponent();
         UpdateBitmap();
@@ -45,10 +52,26 @@ public partial class CanvasView : UserControl
         if (isPointerPressed)
         {
             Point pointOnBitmap = PointAsRatioToPointOnBitmap(pointAsRatio);
-            FlipPixelFromImagePoint(pointOnBitmap);
+            
+            if (previousStrockPoint == null)
+            {
+                FlipPixelFromImagePoint(pointOnBitmap);
+                previousStrockPoint = pointOnBitmap;
+            }
+            else
+            {
+                IEnumerable<Point> interpolationPoints = interpolationService.LinearInterpolationOnGrid(pointOnBitmap,
+                    previousStrockPoint.Value);
+                    
+                foreach (Point point in interpolationPoints)
+                {
+                    FlipPixelFromImagePoint(point);
+                }
+                previousStrockPoint = pointOnBitmap;
+            }
+
+            UpdateBitmap();
         }
-        
-        UpdateBitmap();
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
@@ -56,6 +79,7 @@ public partial class CanvasView : UserControl
         base.OnPointerReleased(e);
         
         isPointerPressed = false;
+        previousStrockPoint = null;
     }
 
     private Point RelativePositionToPointAsRatio(Point relativePosition)
