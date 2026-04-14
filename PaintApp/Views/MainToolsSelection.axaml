@@ -12,11 +12,7 @@
                 <Setter Property="Background" Value="Red"/>
             </Style>
         </StackPanel.Styles>
-        
-        <Button Name="SelectToolButton" Click="SelectToolButton_OnClick">
-            Brush1
-        </Button>
-        <Button>Brush1</Button>
-        <Button>Eraser</Button>
+        <StackPanel Name="ToolsPanel" Spacing="10">
+        </StackPanel>
     </StackPanel>
 </UserControl>
