@@ -3,6 +3,8 @@
   <component name="AvaloniaProject">
     <option name="projectPerEditor">
       <map>
+        <entry key="PaintApp/App.axaml" value="PaintApp/PaintApp.csproj" />
+        <entry key="PaintApp/Views/CanvasView.axaml" value="PaintApp/PaintApp.csproj" />
         <entry key="PaintApp/Views/MainWindow.axaml" value="PaintApp/PaintApp.csproj" />
       </map>
     </option>
