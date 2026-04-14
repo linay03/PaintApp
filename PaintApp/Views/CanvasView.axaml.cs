@@ -1,18 +1,23 @@
-using System;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.LogicalTree;
+using Avalonia.Media.Imaging;
 using Avalonia.VisualTree;
-using PaintApp.ViewModels;
+using SkiaSharp;
 
 namespace PaintApp.Views;
 
 public partial class CanvasView : UserControl
 {
+    private SKBitmap skBitmap;
+    private bool isPointerPressed;
+    
     public CanvasView()
     {
+        skBitmap = new(width: 500, height: 500);
         InitializeComponent();
+        UpdateBitmap();
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -22,9 +27,12 @@ public partial class CanvasView : UserControl
         Point pointOnImage = e.GetPosition(this.FindDescendantOfType<Image>());
         Point pointAsRatio = RelativePositionToPointAsRatio(pointOnImage);
         
-        CanvasViewModel? viewModel = (CanvasViewModel?)DataContext;
-        if (viewModel != null && viewModel.PointerPressedHandlerCommand.CanExecute(pointAsRatio))
-            viewModel.PointerPressedHandlerCommand.Execute(pointAsRatio);
+        Point pointOnBitmap = PointAsRatioToPointOnBitmap(pointAsRatio);
+        
+        FlipPixelFromImagePoint(pointOnBitmap);
+        isPointerPressed = true;
+        
+        UpdateBitmap();
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -34,18 +42,20 @@ public partial class CanvasView : UserControl
         Point pointOnImage = e.GetPosition(this.FindDescendantOfType<Image>());
         Point pointAsRatio = RelativePositionToPointAsRatio(pointOnImage);
         
-        CanvasViewModel? viewModel = (CanvasViewModel?)DataContext;
-        if (viewModel != null && viewModel.PointerMovedHandlerCommand.CanExecute(pointAsRatio))
-            viewModel.PointerMovedHandlerCommand.Execute(pointAsRatio);
+        if (isPointerPressed)
+        {
+            Point pointOnBitmap = PointAsRatioToPointOnBitmap(pointAsRatio);
+            FlipPixelFromImagePoint(pointOnBitmap);
+        }
+        
+        UpdateBitmap();
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
         
-        CanvasViewModel? viewModel = (CanvasViewModel?)DataContext;
-        if (viewModel != null && viewModel.PointerReleasedHandlerCommand.CanExecute(null))
-            viewModel.PointerReleasedHandlerCommand.Execute(null);
+        isPointerPressed = false;
     }
 
     private Point RelativePositionToPointAsRatio(Point relativePosition)
@@ -53,8 +63,37 @@ public partial class CanvasView : UserControl
         Point pointAsRatio = new(relativePosition.X / this.FindDescendantOfType<Image>().Bounds.Size.Width,
             relativePosition.Y / this.FindDescendantOfType<Image>().Bounds.Size.Height);
         
-        Console.WriteLine(pointAsRatio);
-        
         return pointAsRatio;
+    }
+
+    private Point PointAsRatioToPointOnBitmap(Point pointAsRatio)
+    {
+        Point pointOnBitmap = new(pointAsRatio.X * skBitmap.Width, pointAsRatio.Y * skBitmap.Height);
+        return pointOnBitmap;
+    }
+
+    private void UpdateBitmap()
+    {
+        canvasImage.Source = SkBitmapToAvaloniaBitmap(skBitmap);
+    }
+    
+    private static Bitmap SkBitmapToAvaloniaBitmap(SKBitmap skBitmap)
+    {
+        SKData data = skBitmap.Encode(SKEncodedImageFormat.Png, 100);
+        using Stream stream = data.AsStream();
+        return new Bitmap(stream);
+    }
+    
+    private void FlipPixelFromImagePoint(Point point)
+    {
+        FlipPixel((int)point.X, (int)point.Y);
+    }
+    
+    private void FlipPixel(int x, int y)
+    {
+        if (x >= skBitmap.Width || y >= skBitmap.Height || x < 0 || y < 0)
+            return;
+
+        skBitmap.SetPixel(x, y, SKColors.Red);
     }
 }
