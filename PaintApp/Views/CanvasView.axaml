@@ -7,7 +7,7 @@
              >
     
     <Panel>
-        <Image Name="canvasImage" />
+        <Image Name="CanvasImage" />
     </Panel>
     
 </UserControl>

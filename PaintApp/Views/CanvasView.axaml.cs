@@ -74,7 +74,7 @@ public partial class CanvasView : UserControl
 
     private void UpdateBitmap()
     {
-        canvasImage.Source = SkBitmapToAvaloniaBitmap(skBitmap);
+        CanvasImage.Source = SkBitmapToAvaloniaBitmap(skBitmap);
     }
     
     private static Bitmap SkBitmapToAvaloniaBitmap(SKBitmap skBitmap)
