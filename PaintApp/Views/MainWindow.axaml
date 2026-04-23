@@ -8,5 +8,6 @@
         Icon="/Assets/avalonia-logo.ico"
         Title="PaintApp">
     
+    <views:MainToolsSelection />
     <views:CanvasView />
 </Window>
