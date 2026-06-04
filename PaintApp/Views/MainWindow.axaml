@@ -7,6 +7,8 @@
         x:Class="PaintApp.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="PaintApp">
-    
-    <views:MainToolsSelection />
+    <Canvas>
+        <views:CanvasView/>
+        <views:MainToolsSelection />
+    </Canvas>
 </Window>
