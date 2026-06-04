@@ -1,17 +1,19 @@
 using System.Collections.Generic;
 using Avalonia.Controls;
 using PaintApp.Models;
+using PaintApp.Services;
 
 namespace PaintApp.Views;
 
 public partial class MainToolsSelection : UserControl
 {   
     private List<ToolItem> ToolButtons { get; set; }
-    
+    private IToolService toolService;
     public MainToolsSelection()
     {
         InitializeComponent();
         GenerateToolsButtons();
+        //toolService = new ToolService();
     }
     
     /// <summary>
@@ -35,7 +37,10 @@ public partial class MainToolsSelection : UserControl
             };
             
             ToolsPanel.Children.Add(button);
-            button.Click += toolButton.ActivateTool;
+            button.Click += (_, __) =>
+            {
+                toolService.SetCurrentTool(toolButton);
+            };
         }
     }
 }
