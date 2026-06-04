@@ -5,9 +5,9 @@ namespace PaintApp.Services;
 
 public interface IToolService
 {
-    ToolItem CurrentTool { get; }
+    ToolBase CurrentTool { get; }
     
-    List<ToolItem> ToolButtons { get; }
+    List<ToolBase> ToolButtons { get; }
     
-    void SetCurrentTool(ToolItem tool);
+    void SetCurrentTool(ToolBase tool);
 }
