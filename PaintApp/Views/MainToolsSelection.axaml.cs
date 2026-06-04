@@ -7,13 +7,12 @@ namespace PaintApp.Views;
 
 public partial class MainToolsSelection : UserControl
 {   
-    private List<ToolItem> ToolButtons { get; set; }
     private IToolService toolService;
     public MainToolsSelection()
     {
         InitializeComponent();
+        toolService = new ToolService();
         GenerateToolsButtons();
-        //toolService = new ToolService();
     }
     
     /// <summary>
@@ -21,15 +20,7 @@ public partial class MainToolsSelection : UserControl
     /// </summary>
     private void GenerateToolsButtons()
     {
-        ToolButtons =
-        [
-            new ToolItem { Name = "Brush 1" },
-            new ToolItem { Name = "Brush 2" },
-            new ToolItem { Name = "Brush 3" },
-            new ToolItem { Name = "Eraser" }
-        ];
-
-        foreach (var toolButton in ToolButtons)
+        foreach (var toolButton in toolService.ToolButtons)
         {
             var button = new RadioButton
             {
@@ -37,6 +28,12 @@ public partial class MainToolsSelection : UserControl
             };
             
             ToolsPanel.Children.Add(button);
+            
+            if (toolButton == toolService.CurrentTool)
+            {
+                button.IsChecked = true;
+            }
+            
             button.Click += (_, __) =>
             {
                 toolService.SetCurrentTool(toolButton);

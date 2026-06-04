@@ -9,5 +9,4 @@
         Title="PaintApp">
     
     <views:MainToolsSelection />
-    <views:CanvasView />
 </Window>
