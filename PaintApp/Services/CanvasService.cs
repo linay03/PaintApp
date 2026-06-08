@@ -44,16 +44,22 @@ public class CanvasService : ICanvasService
                     
         foreach (Point point in interpolationPoints)
         {
-            FlipPixel(point, color);
+            FlipPixelInternal(point, color);
         }
+        CanvasChanged.Invoke(this, EventArgs.Empty);
     }
     
     public void FlipPixel(Point point, SKColor color)
+    {
+        FlipPixelInternal(point, color);
+        CanvasChanged.Invoke(this, EventArgs.Empty);
+    }
+    
+    private void FlipPixelInternal(Point point, SKColor color)
     {
         if (point.X >= skBitmap.Width || point.Y >= skBitmap.Height || point.X < 0 || point.Y < 0)
             return;
         
         skBitmap.SetPixel((int)point.X, (int)point.Y, color);
-        CanvasChanged.Invoke(this, EventArgs.Empty);
     }
 }
