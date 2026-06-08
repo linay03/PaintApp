@@ -9,16 +9,15 @@ public class ToolService : IToolService
 {   
     public List<ToolBase> ToolButtons { get; set; }
     public ToolBase CurrentTool { get; private set; }
-    public ToolService()
+    public ToolService(ICanvasService canvasService)
     {
         // TODO: Better handle dependencies, this will not work because it is not linked to CanvasView
-        ICanvasService canvasService = new CanvasService();
         
         ToolButtons =
         [
-            new EmptyTool(canvasService),
-            new EmptyTool(canvasService),
-            new EmptyTool(canvasService),
+            new PencilTool(canvasService),
+            new EmptyTool(),
+            new EmptyTool(),
         ];    
         
         CurrentTool = ToolButtons[0];
