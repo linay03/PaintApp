@@ -20,7 +20,15 @@ public class CanvasService : ICanvasService
     public CanvasService(IInterpolationService interpolationService)
     {
         this.interpolationService = interpolationService;
-        skBitmap = new(width: 500, height: 500);
+        skBitmap = new(width: 1500, height: 800);
+
+        for (var i = 0; i < skBitmap.Width; i++)
+        {
+            for (var j = 0; j < skBitmap.Height; j++)
+            {
+                skBitmap.SetPixel(i, j, SKColors.White);
+            }
+        }
     }
 
     public Bitmap AsBitmap()
