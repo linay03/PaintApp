@@ -11,6 +11,9 @@
                 <Setter Property="Background" Value="Red"/>
             </Style>
             <Style Selector="RadioButton">
+                <Setter Property="Background" Value="Gray"/>   
+            </Style>
+            <Style Selector="RadioButton">
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate>
