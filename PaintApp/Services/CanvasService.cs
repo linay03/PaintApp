@@ -11,7 +11,7 @@ namespace PaintApp.Services;
 public class CanvasService : ICanvasService
 {
     private readonly IInterpolationService interpolationService;
-    public event EventHandler CanvasChanged;
+    public event EventHandler? CanvasChanged;
     public int Width => skBitmap.Width;
     public int Height => skBitmap.Height;
 
@@ -46,13 +46,13 @@ public class CanvasService : ICanvasService
         {
             FlipPixelInternal(point, color);
         }
-        CanvasChanged.Invoke(this, EventArgs.Empty);
+        CanvasChanged?.Invoke(this, EventArgs.Empty);
     }
     
     public void FlipPixel(Point point, SKColor color)
     {
         FlipPixelInternal(point, color);
-        CanvasChanged.Invoke(this, EventArgs.Empty);
+        CanvasChanged?.Invoke(this, EventArgs.Empty);
     }
     
     private void FlipPixelInternal(Point point, SKColor color)

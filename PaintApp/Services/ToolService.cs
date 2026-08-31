@@ -11,8 +11,6 @@ public class ToolService : IToolService
     public ToolBase CurrentTool { get; private set; }
     public ToolService(ICanvasService canvasService)
     {
-        // TODO: Better handle dependencies, this will not work because it is not linked to CanvasView
-        
         ToolButtons =
         [
             new PencilTool(canvasService),

@@ -1,14 +1,20 @@
+using System;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using System.Linq;
 using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
+using PaintApp.Services;
+using PaintApp.Services.Interfaces;
 using PaintApp.Views;
 
 namespace PaintApp;
 
 public partial class App : Application
 {
+    public static IServiceProvider Services { get; private set; } = null!;
+    
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -16,6 +22,13 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        ServiceCollection collection = new();
+        collection.AddSingleton<ICanvasService, CanvasService>();
+        collection.AddSingleton<IInterpolationService, InterpolationService>();
+        collection.AddSingleton<IToolService, ToolService>();
+        
+        Services = collection.BuildServiceProvider();
+        
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
