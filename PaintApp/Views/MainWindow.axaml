@@ -9,6 +9,6 @@
         Title="PaintApp">
     <Canvas>
         <views:CanvasView/>
-        <views:MainToolsSelection />
+        <views:MenuView/>
     </Canvas>
 </Window>

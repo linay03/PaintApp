@@ -4,5 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="PaintApp.Views.ColorPicker">
-    
+    <StackPanel Margin="20">
+        <Border Background="Gray"
+                BorderBrush="Black"
+                BorderThickness="2"
+                CornerRadius="3"
+                Padding="10" Margin="10">
+            <ColorPicker
+                ColorSpectrumShape="Ring"
+                Name="CurrentColorPicker">
+            </ColorPicker>        
+        </Border>
+    </StackPanel>
+
 </UserControl>
