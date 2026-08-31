@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.VisualTree;
+using Microsoft.Extensions.DependencyInjection;
 using PaintApp.Services;
 using PaintApp.Services.Interfaces;
 
@@ -10,13 +11,13 @@ namespace PaintApp.Views;
 
 public partial class CanvasView : UserControl
 {
-    private ICanvasService canvasService;
-    private IToolService toolService;
+    private readonly ICanvasService canvasService;
+    private readonly IToolService toolService;
     
     public CanvasView()
     {
-        canvasService = new CanvasService(new InterpolationService());
-        toolService = new ToolService(canvasService);
+        canvasService = App.Services.GetRequiredService<ICanvasService>();
+        toolService = App.Services.GetRequiredService<IToolService>();
         canvasService.CanvasChanged += UpdateBitmap;
         InitializeComponent();
         UpdateBitmap();
