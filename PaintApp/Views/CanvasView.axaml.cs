@@ -1,37 +1,23 @@
-using System.Collections.Generic;
-using System.IO;
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Media.Imaging;
 using Avalonia.VisualTree;
 using PaintApp.Services;
-using SkiaSharp;
+using PaintApp.Services.Interfaces;
 
 namespace PaintApp.Views;
 
 public partial class CanvasView : UserControl
 {
-    IInterpolationService interpolationService;
-    
-    private SKBitmap skBitmap;
-    private bool isPointerPressed;
-    private Point? previousStrockPoint;
+    private ICanvasService canvasService;
+    private IToolService toolService;
     
     public CanvasView()
     {
-        interpolationService = new InterpolationService();
-            
-        skBitmap = new(width: 1500, height: 800);
-
-        for (var i = 0; i < skBitmap.Width; i++)
-        {
-            for (var j = 0; j < skBitmap.Height; j++)
-            {
-                skBitmap.SetPixel(i, j, SKColors.White);
-            }
-        }
-        
+        canvasService = new CanvasService(new InterpolationService());
+        toolService = new ToolService(canvasService);
+        canvasService.CanvasChanged += UpdateBitmap;
         InitializeComponent();
         UpdateBitmap();
     }
@@ -42,13 +28,9 @@ public partial class CanvasView : UserControl
         
         Point pointOnImage = e.GetPosition(this.FindDescendantOfType<Image>());
         Point pointAsRatio = RelativePositionToPointAsRatio(pointOnImage);
-        
         Point pointOnBitmap = PointAsRatioToPointOnBitmap(pointAsRatio);
         
-        FlipPixelFromImagePoint(pointOnBitmap);
-        isPointerPressed = true;
-        
-        UpdateBitmap();
+        toolService.CurrentTool.OnPointerPressed(pointOnBitmap);
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -57,38 +39,20 @@ public partial class CanvasView : UserControl
         
         Point pointOnImage = e.GetPosition(this.FindDescendantOfType<Image>());
         Point pointAsRatio = RelativePositionToPointAsRatio(pointOnImage);
+        Point pointOnBitmap = PointAsRatioToPointOnBitmap(pointAsRatio);
         
-        if (isPointerPressed)
-        {
-            Point pointOnBitmap = PointAsRatioToPointOnBitmap(pointAsRatio);
-            
-            if (previousStrockPoint == null)
-            {
-                FlipPixelFromImagePoint(pointOnBitmap);
-                previousStrockPoint = pointOnBitmap;
-            }
-            else
-            {
-                IEnumerable<Point> interpolationPoints = interpolationService.LinearInterpolationOnGrid(pointOnBitmap,
-                    previousStrockPoint.Value);
-                    
-                foreach (Point point in interpolationPoints)
-                {
-                    FlipPixelFromImagePoint(point);
-                }
-                previousStrockPoint = pointOnBitmap;
-            }
-
-            UpdateBitmap();
-        }
+        toolService.CurrentTool.OnPointerMoved(pointOnBitmap);
     }
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
         
-        isPointerPressed = false;
-        previousStrockPoint = null;
+        Point pointOnImage = e.GetPosition(this.FindDescendantOfType<Image>());
+        Point pointAsRatio = RelativePositionToPointAsRatio(pointOnImage);
+        Point pointOnBitmap = PointAsRatioToPointOnBitmap(pointAsRatio);
+        
+        toolService.CurrentTool.OnPointerReleased(pointOnBitmap);
     }
 
     private Point RelativePositionToPointAsRatio(Point relativePosition)
@@ -101,32 +65,15 @@ public partial class CanvasView : UserControl
 
     private Point PointAsRatioToPointOnBitmap(Point pointAsRatio)
     {
-        Point pointOnBitmap = new(pointAsRatio.X * skBitmap.Width, pointAsRatio.Y * skBitmap.Height);
+        Point pointOnBitmap = new(pointAsRatio.X * canvasService.Width, pointAsRatio.Y * canvasService.Height);
         return pointOnBitmap;
     }
 
+    private void UpdateBitmap(object? sender, EventArgs e)
+        => UpdateBitmap();
+    
     private void UpdateBitmap()
     {
-        CanvasImage.Source = SkBitmapToAvaloniaBitmap(skBitmap);
-    }
-    
-    private static Bitmap SkBitmapToAvaloniaBitmap(SKBitmap skBitmap)
-    {
-        SKData data = skBitmap.Encode(SKEncodedImageFormat.Png, 100);
-        using Stream stream = data.AsStream();
-        return new Bitmap(stream);
-    }
-    
-    private void FlipPixelFromImagePoint(Point point)
-    {
-        FlipPixel((int)point.X, (int)point.Y);
-    }
-    
-    private void FlipPixel(int x, int y)
-    {
-        if (x >= skBitmap.Width || y >= skBitmap.Height || x < 0 || y < 0)
-            return;
-
-        skBitmap.SetPixel(x, y, SKColors.Red);
+        CanvasImage.Source = canvasService.AsBitmap();
     }
 }

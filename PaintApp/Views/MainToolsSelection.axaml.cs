@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Avalonia.Controls;
 using PaintApp.Models;
 using PaintApp.Services;
+using PaintApp.Services.Interfaces;
 
 namespace PaintApp.Views;
 
@@ -10,8 +11,9 @@ public partial class MainToolsSelection : UserControl
     private IToolService toolService;
     public MainToolsSelection()
     {
+        ICanvasService canvasService = new CanvasService(new InterpolationService());
+        toolService = new ToolService(canvasService);
         InitializeComponent();
-        toolService = new ToolService();
         GenerateToolsButtons();
     }
     

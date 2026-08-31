@@ -1,26 +1,28 @@
 using System;
 using System.Collections.Generic;
 using PaintApp.Models;
+using PaintApp.Services.Interfaces;
 
 namespace PaintApp.Services;
 
 public class ToolService : IToolService
 {   
-    public List<ToolItem> ToolButtons { get; set; }
-    public ToolItem CurrentTool { get; private set; }
-    public ToolService()
+    public List<ToolBase> ToolButtons { get; set; }
+    public ToolBase CurrentTool { get; private set; }
+    public ToolService(ICanvasService canvasService)
     {
+        // TODO: Better handle dependencies, this will not work because it is not linked to CanvasView
+        
         ToolButtons =
         [
-            new ToolItem { Name = "Brush 1" },
-            new ToolItem { Name = "Brush 2" },
-            new ToolItem { Name = "Brush 3" },
-            new ToolItem { Name = "Eraser" }
+            new PencilTool(canvasService),
+            new EmptyTool(),
+            new EmptyTool(),
         ];    
         
         CurrentTool = ToolButtons[0];
     }
-    public void SetCurrentTool(ToolItem tool)
+    public void SetCurrentTool(ToolBase tool)
     {
         CurrentTool = tool;
         Console.WriteLine($"Current tool set to: {tool.Name}");
